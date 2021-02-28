@@ -24,43 +24,46 @@ For more detailed documentation, use the python help command,
 # User Visible Differences
 
 * Network comparisons:
-  - eipaddress compares networks based on the network address and network size
+  * eipaddress compares networks based on the network address and network size
     (i.e. the number of addresses in the network).
-  - ipaddress compares networks based on the network address and netmask.
-    - This results in a bigger network (with more addresses) being reported as
+  * ipaddress compares networks based on the network address and netmask.
+    * This results in a bigger network (with more addresses) being reported as
       _less than_ a smaller network (with fewer addresses) if their network
       addresses are the same.
-  - This applies to the comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>-`)
-    and the `compare_networks` method.
-  - This also affects interfaces, as their networks are compared if their
+  * This applies to the comparison operators (`<`, `<=`, `>`, `>-`) and the
+    `compare_networks` method.
+  * This also affects interfaces, as their networks are compared if their
     interface addresses are the same.
 * `get_mixed_type_key`
-  - eipaddress returns the following values, most significant first:
-      version: the IP version of the object
-      address:
-        - for an address or interface, the integer value of the object
-        - for a network, the integer value of the network address
-      scope-ID:
-        - for an IPv6 object; an empty string if there is no scope-ID
-        - omitted for an IPv4 address
-        - an empty string for an IPv4 network or interface
-      size:
-        - for a network or interface, the number of addresses in the network
-        - omitted for an address
-      suffix:
-        - for a network only, to differentiate it from an interface
-        - omitted for an address or an interface
-  - ipaddress order is based on:
-      version: the IP version of the object
-      address:
-        - for an address or interface, the object itself
-        - for a network, the `network_address` object from the network
-      netmask;
-        - for a network, the netmask, as an address object
-        - omitted for an address or interface
+  * eipaddress returns the following values, most significant first:
+      * version: the IP version of the object
+      * address:
+        * for an address or interface, the integer value of the object
+        * for a network, the integer value of the network address
+      * scope-ID:
+        * for an IPv6 object; an empty string if there is no scope-ID
+        * omitted for an IPv4 address
+        * an empty string for an IPv4 network or interface
+      * size:
+        * for a network or interface, the number of addresses in the network
+        * omitted for an address
+      * suffix:
+        * for a network only, to differentiate it from an interface
+        * omitted for an address or an interface
+  * ipaddress returns the following values, most significant first:
+      * version: the IP version of the object
+      * address:
+        * for an address or interface, the object itself
+        * for a network, the `network_address` object from the network
+      * netmask;
+        * for a network, the netmask, as an address object
+        * omitted for an address or interface
+  * Sorting a mixed type list, with hundreds of objects of each type, is an
+    order of magnitude faster in eipaddress.  For details, see the
+    `test_sort_get_mixed_type_key` function in the eipaddress_perf.py module.
 * IPv4Network and IPv6Network `address_exclude`
-  - eipaddress returns the generated subnets in sorted order.
-  - ipaddress returns some generated subnets out of order.
+  * eipaddress returns the generated subnets in sorted order.
+  * ipaddress returns some generated subnets out of order.
 
 # Performance
 
@@ -69,8 +72,8 @@ API calls, with one, or more, use cases for each call, and compares the results
 for eipaddress and ipaddress.  The results are reported for each use case, with
 summaries for each public class, IP version, and more.
 
-To run the performance tests, you must hava a copy of [ipaddress version 1.0](https://github.com/python/cpython/blob/master/Lib/ipaddress.py)
-installed in the same directory as eipaddress, or on your PYTHONPATH.
+To run the performance tests, you must have a copy of [ipaddress version 1.0](https://github.com/python/cpython/blob/master/Lib/ipaddress.py)
+installed in the current directory, or on your PYTHONPATH.
 
 Overall, the time measured for running all of the use cases using eipaddress was
 a little less than half the time for the same use cases to run using ipaddress.
@@ -79,31 +82,31 @@ The following operations on the specified classes are slower than their
 ipaddress version 1.0 equivalents, with a summary of why this is the case:
 
 * `__eq__`, `__ne__`
-  - IPv4Address
-    - This is due to an ipaddress bug: it does not check the  other type.
+  * IPv4Address
+    * This is due to an ipaddress bug: it does not check the  other type.
 * `__lt__`
-  - IPv6Address
-    - This is due to an ipaddress bug: it does not compare the scope-ID.
+  * IPv6Address
+    * This is due to an ipaddress bug: it does not check the  other type or
+    compare the scope-ID.
 * `__reduce__`
-  - IPv6Address
-    - This is due to an ipaddress bug: it does not include the scope-ID.
+  * IPv6Address
+    * This is due to an ipaddress bug: it does not include the scope-ID.
 * `broadcast_address`, `hostmask`
-  - IPv4Network, IPv6Network
-    - eipaddress is faster for the first call, subsequent calls are slower.
-    - ipaddress uses `functools.@cached_property` to save these on first use.
-    - eipaddress sets these values directly on first use, instead of using an
-      extermal cache.
-    - eipaddress object creation followed by access to these properties (up to
-      a reasonable number of times) is faster.
+  * IPv4Network, IPv6Network
+    * ipaddress uses `functools.@cached_property` to save these on first use.
+    * eipaddress sets these values directly on first use, instead of using an
+      extermal cache.  This makes it much faster for the first call, but
+      subsequent calls are slower as the value must be checked it is not None
+      before it is returned.  Object creation followed by access to these
+      properties (up to a reasonable number of times) is faster.
 * `netmask`, `network_address`
-  - IPv4Network, IPv6Network
-    - ipaddress sets these values when the object is created.
-    - eipaddress sets them on first use.
-    - eipaddress object creation followed by access to these attributes (up to
-      a reasonable number of times) is faster.
+  * IPv4Network, IPv6Network
+    * ipaddress sets these values when the object is created.
+    * eipaddress sets them on first use.  Object creation followed by access to
+    these attributes (up to a reasonable number of times) is faster.
 * `ip`
-  - IPv6Interface
-    - This is due to an ipaddress bug: it does not include the scope-ID.
+  * IPv6Interface
+    * This is due to an ipaddress bug: it does not include the scope-ID.
 
 # Memory Usage
 
@@ -116,10 +119,10 @@ size of any other objects allocated to store the values of any attributes it
 references, and the size of the keys used to map the attribute names to the
 referenced objects.  Another consideration is that class attributes do not add
 to the size of an object instance, nor do references to built-in objects.
-The `sizes` module provides a `sizeof` function that takes all of these
-considerations, and more, into account, to return a more accurate measure for
-the size of an object.  This function has been used to compare the sizes of the
-objects used by the eipaddress and ipaddress modules.
+The `sizes.py` module in this repository provides a `sizeof` function that takes
+all of these considerations, and more, into account, to return a more accurate
+measure for the size of an object.  This function has been used to compare the
+sizes of the objects used by the eipaddress and ipaddress modules.
 
 ## Cached Attributes
 
@@ -131,45 +134,49 @@ they are accessed again.
 
 The use of cached attributes means that the size of the object is at its
 smallest when it is created and can grow as each of the cached attributes are
-accessed.  Some caching schemes do not store a direct reference to the cached
-value within the object, but in a separate cache accessed through a hidden
-function or method.
+added.  Some caching schemes do not store a direct reference to the cached
+value within the object, but in a separate cache accessed through a function or
+method.
 
-The eipaddress module classes cache all sttributes with direct references to the
+The eipaddress module classes cache all attributes with direct references to the
 cached values in the instance objects, and the memory for the cached attributes
-is included in the used sizes, in the table, above.
+is included in the used sizes, reported in the summary table, below.
 
-The ipaddress module classes cache some sttributes externally, with no direct
+The ipaddress module classes cache some attributes externally, with no direct
 reference to the cached value in the instance objects.  The cache types used for
-each attribute are listed in the table, below, and whether they are included in
-the sizes measured in the table, above.
+each attribute are listed in the table, below, and the size of the externally
+cached value, if any.
 
-| Cache Type | Attribute | External | Size |
-| --- | --- | --- | ---:|
-| `functools.lru_cache()` | `IPv4Address.is_private` | YES | 24 |
-| `functools.lru_cache()` | `IPv4Address.is_global` | YES | 28 |
-| `functools.lru_cache()` | `IPv6Address.is_private` | YES | 28 |
-| `functools.cached_property` | `IPv4Interface.hostmask` | NO | |
-| `functools.cached_property` | `IPv6Interface.hostmask` | NO | |
-| `functools.lru_cache()` | `IPv4Network.is_global` | YES | 28 |
-| `functools.cached_property` | `IPv4Network.broadcast_address` | NO | |
-| `functools.cached_property` | `IPv4Network.hostmask` | NO | |
-| class attribute dictionary | `IPv4Network.netmask` | YES | 80 |
-| `functools.cached_property` | `IPv6Network.broadcast_address` | NO | |
-| `functools.cached_property` | `IPv6Network.hostmask` | NO | |
-| class attribute dictionary | `IPv6Network.netmask` | YES | 100 |
+| `ipaddress` Cache Type | Attribute | External Size |
+| --- | --- | ---:|
+| `functools.lru_cache()` | `IPv4Address.is_private` | 24 or 28 |
+| `functools.lru_cache()` | `IPv4Address.is_global` | 24 or 28 |
+| `functools.lru_cache()` | `IPv6Address.is_private` | 24 or 28 |
+| `functools.cached_property` | `IPv4Interface.hostmask` | 0 |
+| `functools.cached_property` | `IPv6Interface.hostmask` | 0 |
+| `functools.lru_cache()` | `IPv4Network.is_global` | 24 or 28 |
+| `functools.cached_property` | `IPv4Network.broadcast_address` | 0 |
+| `functools.cached_property` | `IPv4Network.hostmask` | 0 |
+| class attribute dictionary | `IPv4Network.netmask` | 80 |
+| `functools.cached_property` | `IPv6Network.broadcast_address` | 0 |
+| `functools.cached_property` | `IPv6Network.hostmask` | 0 |
+| class attribute dictionary | `IPv6Network.netmask` | 100 |
 
-> __Note__: The external sizes in the table, above, and the summary table,
-> below, are just for the cached value, they do not include the overhead of the
-> key used to index the cache.
+__Note 1:__ The external sizes in the cached attributes table, above, and the
+summary table, below, are just for the cached value, they do not include the
+overhead for the key used to index the cache.
+
+__Note 2:__ The `is_...` attributes are boolean values, with an external size of
+24 for `False`, or 28 for `True`.
 
 ## Summary
 
 The following table summarises the memory size for objects of each type in the
 ipaddress and eipaddress modules.  The unused size is the minimal object size,
 with none of the cached attributes populated.  The used size is with all of the
-cached attributes populated.  The external size is the size of the externally cached attributes (excluding the overhead for the cache index values).  The total
-size is the sum of the used and external sizes.
+cached attributes populated.  The external size is the size of the externally
+cached attributes (excluding the overhead for the cache index values).  The
+total size is the sum of the used and external sizes.
 
 | Object Type | Value | Unused Size | Used Size | External Size | Total Size |
 | --- | --- | ---:| ---:| ---:| ---:|
@@ -186,62 +193,64 @@ size is the sum of the used and external sizes.
 | ipaddress. IPv6Network | '3000::%N/16' | 611 | 1186 | 100 | 1286 |
 | eipaddress. IPv6Network | '3000::%N/16' | 320 | 652 | 0 | 612 |
 
+__Note 3:__ The sizes may differ a little if different object values are used.
+
 # Public API Extensions
 
 * `ishexdigit`
-  - A function to check if a string contains only hexadecimal digit characters.
-    This is a faster alternative to the `_BaseV6._HEX_DIGITS.issuperset` check
+  * A function to check if a string contains only hexadecimal digit characters.
+    This is slightly faster than the `_BaseV6._HEX_DIGITS.issuperset` check
     used in ipaddress.
 * `from_string`
-  - IPv4Address, IPv6Address
-    - This static method converts an IP address string to an integer.
-  - IPv4Network, IPv6Network
-    - This class method converts an IP address string to an integer address and
+  * IPv4Address, IPv6Address
+    * This static method converts an IP address string to an integer.
+  * IPv4Network, IPv6Network
+    * This class method converts an IP address string to an integer address and
       prefix length.
 * `from_string_with_scope`
-  - IPv6Address
-    - This class method converts an IP address string with an optional scope-ID
+  * IPv6Address
+    * This class method converts an IP address string with an optional scope-ID
       to a tuple: with the address (as an integer) and the scope-ID (as a
       string, or None, if there is no scope-ID).
-  - IPv6Network
-    - This class method converts an IP address string with an optional scope-ID
+  * IPv6Network
+    * This class method converts an IP address string with an optional scope-ID
       and an optional prefix to a tuple: with the address and prefix length (as
       integers) and the scope-ID (as a string, or None, if there is no
       scope-ID).
 * `to_string`
-  - IPv4Address
-    - This class method converts an integer to an IP address string.
-  - IPv6Address
-    - This class method converts an integer and an optional scope-ID to an IP
+  * IPv4Address
+    * This class method converts an integer to an IP address string.
+  * IPv6Address
+    * This class method converts an integer and an optional scope-ID to an IP
       address string.
-  - IPv4Network
-    - This class method converts an integer address and prefix length to an IP
+  * IPv4Network
+    * This class method converts an integer address and prefix length to an IP
       network string.
-  - IPv6Network
-    - This class method converts an integer address, prefix length and an
+  * IPv6Network
+    * This class method converts an integer address, prefix length and an
       optional scope-ID to an IP network string.
 * `to_string_exploded`
-  - IPv4Address, IPv4Network
-    - This is a pseudonym for the `to_string` method.
-  - IPv6Address
-    - This class method converts an integer and an optional scope-ID to an
+  * IPv4Address, IPv4Network
+    * This is a pseudonym for the `to_string` method.
+  * IPv6Address
+    * This class method converts an integer and an optional scope-ID to an
       exploded IP address string.
-  - IPv6Network
-    - This class method converts an integer address, prefix length and an
+  * IPv6Network
+    * This class method converts an integer address, prefix length and an
       optional scope-ID to an exploded IP network string.
 * `exclude`
-  - IPv4Network, IPv6Network
+  * IPv4Network, IPv6Network
     This method is similar to the ipaddress network `address_exclude` method,
     but it accepts a network, or an address, to be excluded: `address_exclude`
     only accepts a network to be excluded.  It returns an iterator of subnets of
     this network, with the given network, or address, excluded.
 * `subnetworks`
-  - IPv4Network, IPv6Network
+  * IPv4Network, IPv6Network
     This method is similar to the ipaddress network `subnets` method, but the
-    prefixlen_diff` argument has been renamed to `diff` and its default value is
-    None, instead of 1.  It returns an iterator of the subnet network objects.
+    `prefixlen_diff` argument has been renamed to `diff` and its default value
+    is None, instead of 1.  It returns an iterator of subnet network objects.
 * `supernetwork`
-  - IPv4Network, IPv6Network
+  * IPv4Network, IPv6Network
     This method is similar to the ipaddress network `supernet` method, but the
     `prefixlen_diff` argument has been renamed to `diff` and its default value
     is None, instead of 1.  It returns the supernet network object.
