@@ -63,7 +63,7 @@ For more detailed documentation, use the python help command,
   * Sorting a mixed type list, with hundreds of objects of each type, is an
     order of magnitude faster with eipaddress.  For details, see the
     `test_sort_get_mixed_type_key` function in the eipaddress_perf.py module.
-* IPv4Network and IPv6Network `address_exclude`
+* `IPv4Network.address_exclude`, `IPv6Network.address_exclude`
   * eipaddress returns the generated subnets in sorted order.
   * ipaddress returns some generated subnets out of order.
 
@@ -118,9 +118,9 @@ references, and the size of the keys used to map the attribute names to the
 referenced objects.  Another consideration is that class attributes do not add
 to the size of an object instance, nor do references to built-in objects.
 The `sizes.py` module in this repository provides a `sizeof` function that takes
-all of these considerations, and more, into account, to return a more accurate
-measure for the size of an object.  This function has been used to compare the
-sizes of the objects used by the eipaddress and ipaddress modules.
+all of these considerations into account, to return a more accurate measure for
+the size of an object.  This function has been used to compare the sizes of the
+objects used by the eipaddress and ipaddress modules.
 
 ## Cached Attributes
 
@@ -195,72 +195,72 @@ __Note 3:__ The sizes may differ a little if different object values are used.
 
 # Public API Extensions
 
-* `ishexdigit`
+##### `ishexdigit`
   A function to check if a string contains only hexadecimal digit characters.
   This is slightly faster than the `_BaseV6._HEX_DIGITS.issuperset` check used
   in ipaddress.
-* `IPv4Address.from_string`
+##### `IPv4Address.from_string`
   This static method converts an IPv4 address string to an integer.
-* `IPv6Address.from_string`
+##### `IPv6Address.from_string`
   This static method converts an IPv6 address string to an integer.
-* `IPv4Network.from_string`
+##### `IPv4Network.from_string`
   This class method converts an IPv4 address string to an integer address and
   prefix length.
-* `IPv6Network.from_string`
+##### `IPv6Network.from_string`
   This class method converts an IPv6 address string to an integer address and
   prefix length.
-* `IPv6Address.from_string_with_scope`
+##### `IPv6Address.from_string_with_scope`
   This class method converts an IPv6 address string with an optional scope-ID to
   a tuple: with the address (as an integer) and the scope-ID (as a string, or
   None, if there is no scope-ID).
-* `IPv6Network.from_string_with_scope`
+##### `IPv6Network.from_string_with_scope`
   This class method converts an IPv6 address string with an optional scope-ID
   and an optional prefix to a tuple: with the address and prefix length (as
   integers) and the scope-ID (as a string, or None, if there is no scope-ID).
-* `IPv4Address.to_string`
+##### `IPv4Address.to_string`
   This class method converts an integer to an IPv4 address string.
-* `IPv6Address.to_string`
+##### `IPv6Address.to_string`
   This class method converts an integer and an optional scope-ID to an IPv6
   address string.
-* `IPv4Network.to_string`
+##### `IPv4Network.to_string`
   This class method converts an integer address and prefix length to an IPv4
   network string.
-* `IPv6Network.to_string`
+##### `IPv6Network.to_string`
   This class method converts an integer address, prefix length and an optional
   scope-ID to an IPv6 network string.
-* `IPv4Address.to_string_exploded`
+##### `IPv4Address.to_string_exploded`
   This is a pseudonym for the `IPv4Address.to_string` method.
-* `IPv4Network.to_string_exploded`
+##### `IPv4Network.to_string_exploded`
   This is a pseudonym for the `IPv4Network.to_string` method.
-* `IPv6Address.to_string_exploded`
+##### `IPv6Address.to_string_exploded`
   This class method converts an integer and an optional scope-ID to an exploded
   IPv6 address string.
-* `IPv6Network.to_string_exploded`
+##### `IPv6Network.to_string_exploded`
   This class method converts an integer address, prefix length and an optional
   scope-ID to an exploded IPv6 network string.
-* `IPv4Network.exclude`
+##### `IPv4Network.exclude`
   This method is similar to the ipaddress `IPv4Network.address_exclude` method,
   but it accepts a network, or an address, to be excluded: `address_exclude`
   only accepts a network to be excluded.  It returns an iterator of subnets of
   this network, with the given network, or address, excluded.
-* `IPv6Network.exclude`
+##### `IPv6Network.exclude`
   This method is similar to the ipaddress `IPv6Network.address_exclude` method,
   but it accepts a network, or an address, to be excluded: `address_exclude`
   only accepts a network to be excluded.  It returns an iterator of subnets of
   this network, with the given network, or address, excluded.
-* `IPv4Network.subnetworks`
+##### `IPv4Network.subnetworks`
   This method is similar to the ipaddress `IPv4Network.subnets` method, but the
   `prefixlen_diff` argument has been renamed to `diff` and its default value is
   None, instead of 1.  It returns an iterator of subnet network objects.
-* `IPv6Network.subnetworks`
+##### `IPv6Network.subnetworks`
   This method is similar to the ipaddress `IPv6Network.subnets` method, but the
   `prefixlen_diff` argument has been renamed to `diff` and its default value is
   None, instead of 1.  It returns an iterator of subnet network objects.
-* `IPv4Network.supernetwork`
+##### `IPv4Network.supernetwork`
   This method is similar to the ipaddress `IPv4Network.supernet` method, but the
   `prefixlen_diff` argument has been renamed to `diff` and its default value is
   None, instead of 1.  It returns the supernet network object.
-* `IPv6Network.supernetwork`
+##### `IPv6Network.supernetwork`
   This method is similar to the ipaddress `IPv6Network.supernet` method, but the
   `prefixlen_diff` argument has been renamed to `diff` and its default value is
   None, instead of 1.  It returns the supernet network object.
