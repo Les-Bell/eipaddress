@@ -189,7 +189,7 @@ total size is the sum of the used and external sizes.
 | ipaddress. IPv6Interface | '1000::2%I/24' | 877 | 1286 | 0 | 1286 |
 | eipaddress. IPv6Interface | '1000::2%I/24' | 434 | 610 | 0 | 610 |
 | ipaddress. IPv6Network | '3000::%N/16' | 611 | 1186 | 100 | 1286 |
-| eipaddress. IPv6Network | '3000::%N/16' | 320 | 652 | 0 | 612 |
+| eipaddress. IPv6Network | '3000::%N/16' | 320 | 652 | 0 | 652 |
 
 __Note 3:__ The sizes may differ a little if different object values are used.
 
