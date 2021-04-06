@@ -83,7 +83,7 @@ a little less than half the time for the same use cases to run using ipaddress.
 The following operations on the specified classes are slower than their
 ipaddress version 1.0 equivalents, with a summary of why this is the case:
 
-* `_IPv4Address._eq__`, `_IPv4Address.__ne__`
+* `_IPv4Address.__eq__`, `_IPv4Address.__ne__`
   This is due to an ipaddress bug: it does not check the  other type.
 * `IPv6Address.__lt__`
   This is due to an ipaddress bug: it does not check the  other type or compare
